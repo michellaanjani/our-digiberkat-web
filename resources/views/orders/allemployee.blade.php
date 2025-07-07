@@ -1,111 +1,105 @@
 @extends('employee')
 
-@section('title', 'Pesanan ' . $statusLabel)
+@section('title', 'Semua Pesanan')
 
 @section('content')
 <div class="container py-4">
   <div class="row">
     <div class="col-md-12">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Pesanan {{ $statusLabel }}</h2>
-        <div class="btn-group">
-          <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-            Filter Status
-          </button>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{{ route('orders.status', 'pending') }}">
-              <span class="badge bg-warning me-2"></span> Belum Diproses
-            </a></li>
-            <li><a class="dropdown-item" href="{{ route('orders.status', 'expired') }}">
-              <span class="badge bg-info me-2"></span> Kadaluarsa
-            </a></li>
-            <li><a class="dropdown-item" href="{{ route('orders.status', 'done') }}">
-              <span class="badge bg-success me-2"></span> Selesai
-            </a></li>
-            <li><a class="dropdown-item" href="{{ route('orders.status', 'cancelled') }}">
-              <span class="badge bg-danger me-2"></span> Dibatalkan
-            </a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{{ route('orders.index') }}">
-              <i class="fas fa-list me-2"></i> Semua Pesanan
-            </a></li>
-          </ul>
+        <div class="d-flex align-items-center gap-2">
+          <h2><i class="fas fa-clipboard-list me-2"></i>Semua Pesanan</h2>
+          <div class="ms-3">
+            <select id="statusFilter" class="form-select form-select-sm">
+              <option value="">Semua Status</option>
+              <option value="Belum Diproses">Belum Diproses</option>
+              <option value="Selesai">Selesai</option>
+              <option value="Kadaluarsa">Kadaluarsa</option>
+              <option value="Dibatalkan">Dibatalkan</option>
+            </select>
+          </div>
         </div>
       </div>
-      <p class="text-muted small">Klik pada kepala tabel untuk mengurutkan berdasarkan kolom. Klik pada pesanan untuk melihat detailnya.</p>
 
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover" id="orderTable">
-          <thead class="table-light">
-            <tr>
-              <th onclick="sortTable(0)">ID <i class="fas fa-sort"></i></th>
-              <th>Gambar</th>
-              <th onclick="sortTable(2)">Produk <i class="fas fa-sort"></i></th>
-              <th onclick="sortTable(3)">Status <i class="fas fa-sort"></i></th>
-              <th onclick="sortTable(4)">Total <i class="fas fa-sort"></i></th>
-              <th onclick="sortTable(5)">Tanggal <i class="fas fa-sort"></i></th>
-            </tr>
-          </thead>
-          <tbody>
-            @forelse($orders as $entry)
-              @php
-                $order = $entry['order'];
-                $item = $entry['sample_item'];
-              @endphp
-              <tr onclick="window.location='{{ route('orders.showemployee', $order['id']) }}'" style="cursor: pointer;">
-                <td>{{ $order['id'] }}</td>
-                <td>
-                  <img src="{{ $item['thumbnail'] }}" width="50" class="img-thumbnail">
-                </td>
-                <td>
-                  {{ $item['product_name'] }}
-                  @if(isset($item['variant']) && $item['variant'])
-                    <br><small class="text-muted">{{ $item['variant']['name'] }}</small>
-                  @endif
-                </td>
-                <td>
-                  @if($order['status'] === 'pending')
-                    <span class="badge bg-warning text-dark">Belum Diproses</span>
-                  @elseif($order['status'] === 'expired')
-                    <span class="badge bg-info text-white">Kadaluarsa</span>
-                  @elseif($order['status'] === 'done')
-                    <span class="badge bg-success text-white">Selesai</span>
-                  @elseif($order['status'] === 'cancelled')
-                    <span class="badge bg-danger text-white">Dibatalkan</span>
-                  @else
-                    <span class="badge bg-secondary">{{ ucfirst($order['status']) }}</span>
-                  @endif
-                </td>
-                <td>Rp{{ number_format($order['total_price'], 0, ',', '.') }}</td>
-                <td>{{ \Carbon\Carbon::parse($order['created_at'])->format('d M Y H:i') }}</td>
-              </tr>
-            @empty
-              <tr>
-                <td colspan="6" class="text-center py-5">
-                  <div class="d-flex flex-column align-items-center">
-                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                    <h5 class="text-muted mb-2">Tidak ada pesanan</h5>
-                    <p class="text-muted small">Belum ada pesanan dengan status {{ $statusLabel }}</p>
-                    <a href="{{ route('orders.index') }}" class="btn btn-sm btn-primary mt-2">
-                      <i class="fas fa-arrow-left me-1"></i> Kembali ke Semua Pesanan
-                    </a>
-                  </div>
-                </td>
-              </tr>
-            @endforelse
-          </tbody>
-        </table>
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="orderTable">
+              <thead class="table-light">
+                <tr>
+                  <th class="text-center">ID</th>
+                  <th class="text-center">Gambar</th>
+                  <th>Produk</th>
+                  <th>Status</th>
+                  <th class="text-end">Total</th>
+                  <th class="text-center">Tanggal</th>
+                  <th class="text-center">Tindakan</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach($orders as $entry)
+                  @php
+                    $order = $entry['order'];
+                    $item = $entry['sample_item'];
+                    $variant = $item['variant'] ?? null;
+                  @endphp
+                  <tr>
+                    <td class="text-center fw-bold">#{{ $order['id'] }}</td>
+                    <td class="text-center">
+                      <img src="{{ $item['thumbnail'] }}" class="img-thumbnail rounded" width="50" alt="{{ $item['product_name'] }}">
+                    </td>
+                    <td>
+                      <div class="fw-semibold">{{ $item['product_name'] }}</div>
+                      @if($variant)
+                        <small class="text-muted">{{ $variant['name'] }}</small>
+                      @endif
+                    </td>
+                    <td>
+                      @switch($order['status'])
+                        @case('pending')
+                          <span class="badge bg-warning text-dark">Belum Diproses</span>
+                          @break
+                        @case('done')
+                          <span class="badge bg-success text-white">Selesai</span>
+                          @break
+                        @case('expired')
+                          <span class="badge bg-secondary text-white">Kadaluarsa</span>
+                          @break
+                        @case('cancelled')
+                          <span class="badge bg-danger text-white">Dibatalkan</span>
+                          @break
+                        @default
+                          <span class="badge bg-secondary">{{ ucfirst($order['status']) }}</span>
+                      @endswitch
+                    </td>
+                    <td class="text-end fw-bold" data-order="{{ $order['total_price'] }}">
+                      Rp{{ number_format($order['total_price'], 0, ',', '.') }}
+                    </td>
+                    <td class="text-center" data-order="{{ strtotime($order['created_at']) }}">
+                      <div>{{ \Carbon\Carbon::parse($order['created_at'])->translatedFormat('d M Y') }}</div>
+                      <small class="text-muted">{{ \Carbon\Carbon::parse($order['created_at'])->format('H:i') }}</small>
+                    </td>
+                    <td class="text-center">
+                      <a href="/orders/{{ $order['id'] }}" class="btn btn-sm btn-outline-primary" title="Detail">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                    </td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 @endsection
+
 @section('scripts')
-<!-- DataTables CSS dengan tema Bootstrap 5 -->
+<!-- DataTables Resources -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap5.min.css">
-
-<!-- DataTables JS dengan ekstensi -->
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
@@ -115,101 +109,80 @@
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 
 <script>
-// Fungsi sorting custom (jika masih diperlukan)
-function sortTable(n) {
-    const table = document.getElementById("orderTable");
-    let switching = true, dir = "asc", switchcount = 0;
-
-    while (switching) {
-        switching = false;
-        const rows = table.rows;
-
-        for (let i = 1; i < (rows.length - 1); i++) {
-            let shouldSwitch = false;
-            const x = rows[i].getElementsByTagName("TD")[n];
-            const y = rows[i + 1].getElementsByTagName("TD")[n];
-
-            let xContent = x.innerText || x.textContent;
-            let yContent = y.innerText || y.textContent;
-
-            const xNum = parseFloat(xContent.replace(/[^\d.]/g, '')) || 0;
-            const yNum = parseFloat(yContent.replace(/[^\d.]/g, '')) || 0;
-
-            const compareResult = (!isNaN(xNum) && !isNaN(yNum)) ?
-                (dir === "asc" ? xNum > yNum : xNum < yNum) :
-                (dir === "asc" ? xContent.toLowerCase() > yContent.toLowerCase() : xContent.toLowerCase() < yContent.toLowerCase());
-
-            if (compareResult) {
-                shouldSwitch = true;
-                break;
-            }
-        }
-
-        if (shouldSwitch) {
-            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-            switching = true;
-            switchcount++;
-        } else if (switchcount === 0 && dir === "asc") {
-            dir = "desc";
-            switching = true;
-        }
-    }
-}
-
-// Inisialisasi DataTables dengan konfigurasi lengkap
-$(document).ready(function () {
-    $('#orderTable').DataTable({
-        order: [[5, 'desc']], // Default sorting by date descending
+$(document).ready(function() {
+    const table = $('#orderTable').DataTable({
+        order: [[5, 'desc']],
         language: {
             url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/id.json',
             search: "_INPUT_",
-            searchPlaceholder: "Cari pesanan..."
+            searchPlaceholder: "Cari pesanan...",
+            buttons: {
+                excel: 'Excel',
+                print: 'Print'
+            }
         },
-        dom: '<"row mb-3"<"col-sm-12 col-md-4"l><"col-sm-12 col-md-4"B><"col-sm-12 col-md-4"f>>rt<"row mt-3"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+        dom: '<"row mb-3"<"col-md-4"l><"col-md-4"B><"col-md-4"f>>rt<"row mt-3"<"col-md-6"i><"col-md-6"p>>',
         buttons: [
+            {
+                extend: 'excel',
+                text: '<i class="fas fa-file-excel me-2"></i> Excel',
+                className: 'btn btn-success btn-sm',
+                exportOptions: {
+                    columns: [0, 2, 3, 4, 5],
+                    format: {
+                        body: function(data, row, column, node) {
+                            const html = $(node).html() || '';
+                            const clean = html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+                            if (column === 0) return clean.replace(/^#/, '');
+                            if (column === 4) return clean.replace(/[^\d]/g, '');
+                            if (column === 5) {
+                                const div = document.createElement('div');
+                                div.innerHTML = html;
+                                const date = div.querySelector('div')?.textContent?.trim() || '';
+                                const time = div.querySelector('small')?.textContent?.trim() || '';
+                                return `${date} ${time}`;
+                            }
+                            return clean;
+                        }
+                    }
+                }
+            },
             {
                 extend: 'print',
                 text: '<i class="fas fa-print me-2"></i> Print',
                 className: 'btn btn-info btn-sm',
                 exportOptions: {
                     columns: [0, 2, 3, 4, 5]
+                },
+                customize: function(win) {
+                    $(win.document.body).find('table').addClass('table-bordered');
+                    $(win.document.body).find('h1').css('text-align','center');
                 }
             }
         ],
         columnDefs: [
-            {
-                orderable: false,
-                targets: [1],
-                className: 'text-center' // Kolom gambar di-center
-            },
-            {
-                targets: [4], // Kolom total
-                className: 'text-end' // Rata kanan untuk nominal
-            },
-            {
-                targets: '_all',
-                className: 'align-middle' // Vertikal middle untuk semua sel
-            }
+            { orderable: true, targets: [0, 2, 3, 4, 5] },
+            { orderable: false, targets: [1, 6] },
+            { className: 'text-center', targets: [0, 1, 5, 6] },
+            { className: 'text-end', targets: [4] },
+            { className: 'align-middle', targets: '_all' }
         ],
         responsive: true,
         initComplete: function() {
-            // Custom styling untuk search box
             $('.dataTables_filter input').addClass('form-control form-control-sm');
             $('.dataTables_length select').addClass('form-select form-select-sm');
-        },
-        drawCallback: function() {
-            // Tooltip untuk ikon
-            $('[data-bs-toggle="tooltip"]').tooltip();
+            $('.dt-buttons button').removeClass('btn-secondary').addClass('btn-sm');
+
+            $('#statusFilter').on('change', function () {
+                const value = $(this).val();
+                table.column(3).search(value).draw();
+            });
         }
     });
-
-    // Hilangkan fungsi sortTable jika menggunakan DataTables sorting
-    // sortTable(5); // Dapat dihapus karena sudah dihandle DataTables
 });
 </script>
 
 <style>
-/* Custom Styling */
 #orderTable thead th {
     background-color: #f8f9fa;
     font-weight: 600;
@@ -272,3 +245,4 @@ $(document).ready(function () {
 }
 </style>
 @endsection
+
