@@ -101,6 +101,7 @@ Route::middleware(['check.login', 'check.token', 'check.role:employee'])->group(
     */
     Route::prefix('employee')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'employeeindex'])->name('employee.dashboard');
+        Route::get('/orders/all', [OrderController::class, 'indexemployee'])->name('orders.index.employee');
     });
 });
 
