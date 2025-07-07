@@ -25,18 +25,24 @@
     }
   ],
   "outputDirectory": "public",
-  "buildCommand": "npm install && npm run build && /usr/bin/php artisan optimize:clear && /usr/bin/php artisan config:cache && /usr/bin/php artisan route:cache && /usr/bin/php artisan view:cache",
-  "env": {
-    "APP_ENV": "production",
-    "APP_DEBUG": "0",
-    "APP_URL": "https://your-project-name.vercel.app",
-    "APP_KEY": "base64:your_app_key_here",
-    "APP_CONFIG_CACHE": "/tmp/config.php",
-    "APP_EVENTS_CACHE": "/tmp/events.php",
-    "APP_PACKAGES_CACHE": "/tmp/packages.php",
-    "APP_ROUTES_CACHE": "/tmp/routes.php",
-    "APP_SERVICES_CACHE": "/tmp/services.php",
-    "VIEW_COMPILED_PATH": "/tmp",
-    "CACHE_DRIVER": "array"
-  }
+
+    "env": {
+        "APP_NAME": "Laravel",
+        "APP_ENV": "production",
+        "APP_KEY": "base64:0nU1Ux9swZmHzE3T7YYke1PQNfFOe+CUmXwQOEOq5Xw=",
+        "APP_DEBUG": "0",
+        "APP_URL": "https://your-project-name.vercel.app",
+        "APP_CONFIG_CACHE": "/tmp/config.php",
+        "APP_EVENTS_CACHE": "/tmp/events.php",
+        "APP_PACKAGES_CACHE": "/tmp/packages.php",
+        "APP_ROUTES_CACHE": "/tmp/routes.php",
+        "APP_SERVICES_CACHE": "/tmp/services.php",
+        "VIEW_COMPILED_PATH": "/tmp",
+        "CACHE_DRIVER": "array",
+        "LOG_CHANNEL": "stderr",
+        "LOG_LEVEL": "info",
+        "SESSION_DRIVER": "cookie",
+        "VITE_APP_NAME": "Laravel"
+    }
+
 }
