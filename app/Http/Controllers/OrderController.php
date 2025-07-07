@@ -266,46 +266,15 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $token = session('api_token');
-        if (!$token) {
-            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
-        }
-
-        try {
-            $response = Http::withToken($token)->timeout(10)->get("{$this->baseUrl}/orders/{$id}");
-
-            if ($response->successful()) {
-                $data = $response->json();
-                // Asumsi struktur API GoLang: { "data": [ {item1}, {item2} ], "total_order_price": X, "status": Y, "created_at": Z }
-                $items = $data['data'] ?? [];
-                $total = $data['total_order_price'] ?? 0;
-                $status = $data['status'] ?? 'pending';
-                $created_at = $data['created_at'] ?? now();
-
-                return view('orders.show', compact('items', 'total', 'status', 'created_at'))
-                             ->with('orderId', $id);
-            }
-
-            Log::error('Gagal mengambil detail pesanan untuk show (standar):', [
-                'order_id' => $id,
-                'status' => $response->status(),
-                'body' => $response->body()
-            ]);
-            return back()->with('error', 'Gagal mengambil detail pesanan. Kode: ' . $response->status());
-
-        } catch (\Exception $e) {
-            Log::error('Pengecualian saat mengambil detail pesanan untuk show (standar):', ['order_id' => $id, 'error' => $e->getMessage()]);
-            return back()->with('error', 'Server tidak tersedia: ' . $e->getMessage());
-        }
+        return $this->renderOrderDetail($id, 'orders.show');
     }
 
-    /**
-     * Menampilkan detail pesanan khusus untuk karyawan.
-     *
-     * @param int $id The ID of the order.
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-     */
-    public function showemployee($id)
+    public function showEmployee($id)
+    {
+        return $this->renderOrderDetail($id, 'orders.showemployee');
+    }
+
+    private function renderOrderDetail($id, $view)
     {
         $token = session('api_token');
         if (!$token) {
@@ -317,40 +286,30 @@ class OrderController extends Controller
 
             if ($response->successful()) {
                 $data = $response->json();
+                $items = $data['data'] ?? [];
+                $total = $data['total_order_price'] ?? 0;
+                $status = $data['status'] ?? 'pending';
+                $created_at = $data['created_at'] ?? now();
 
-                // Logging respons API untuk debugging
-                Log::info('Respons API untuk showemployee:', ['order_id' => $id, 'response_data' => $data]);
-
-                // Asumsi struktur API GoLang:
-                // Jika API mengembalikan { "data": { "id": 1, "items": [...], "total_order_price": X, ... } }
-                // maka $orderData = $data['data'];
-                // Jika API hanya mengembalikan { "id": 1, "items": [...], "total_order_price": X, ... }
-                // maka $orderData = $data;
-                $orderData = $data['data'] ?? $data;
-
-                // Ekstraksi data berdasarkan asumsi struktur $orderData
-                $items = $orderData['items'] ?? []; // Daftar item dalam pesanan
-                $total = $orderData['total_order_price'] ?? $orderData['total_amount'] ?? 0; // Sesuaikan field total
-                $status = $orderData['status'] ?? 'pending';
-                $created_at = $orderData['created_at'] ?? now();
-
-                return view('orders.showemployee', compact('items', 'total', 'status', 'created_at'))
-                                     ->with('orderId', $id);
+                return view($view, compact('items', 'total', 'status', 'created_at'))
+                    ->with('orderId', $id);
             }
 
-            Log::error('Gagal mengambil detail pesanan untuk showemployee:', [
+            Log::error('Gagal mengambil detail pesanan:', [
                 'order_id' => $id,
                 'status' => $response->status(),
                 'body' => $response->body()
             ]);
-            return back()->with('error', 'Gagal mengambil detail pesanan untuk karyawan. Kode: ' . $response->status());
+            return back()->with('error', 'Gagal mengambil detail pesanan. Kode: ' . $response->status());
 
         } catch (\Exception $e) {
-            Log::error('Pengecualian saat mengambil detail pesanan untuk showemployee:', ['order_id' => $id, 'error' => $e->getMessage()]);
+            Log::error('Pengecualian saat mengambil detail pesanan:', [
+                'order_id' => $id,
+                'error' => $e->getMessage()
+            ]);
             return back()->with('error', 'Server tidak tersedia: ' . $e->getMessage());
         }
     }
-
     /**
      * Helper function to get human-readable status labels.
      *
