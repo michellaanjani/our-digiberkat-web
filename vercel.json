@@ -3,10 +3,22 @@
   "framework": null,
   "functions": {
     "api/index.php": {
-      "runtime": "vercel-php@0.7.0"
+      "runtime": "vercel-php@0.7.3"
     }
   },
   "routes": [
+    {
+      "src": "/build/(.*)",
+      "dest": "/public/build/$1"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/public/images/$1"
+    },
+    {
+        "src": "/(.*\\.php)",
+        "dest": "/api/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "/api/index.php"
@@ -18,10 +30,13 @@
     "APP_ENV": "production",
     "APP_DEBUG": "0",
     "APP_URL": "https://your-project-name.vercel.app",
+    "APP_KEY": "base64:your_app_key_here",
     "APP_CONFIG_CACHE": "/tmp/config.php",
     "APP_EVENTS_CACHE": "/tmp/events.php",
     "APP_PACKAGES_CACHE": "/tmp/packages.php",
     "APP_ROUTES_CACHE": "/tmp/routes.php",
-    "APP_VIEWS_CACHE": "/tmp/views"
+    "APP_SERVICES_CACHE": "/tmp/services.php",
+    "VIEW_COMPILED_PATH": "/tmp",
+    "CACHE_DRIVER": "array"
   }
 }
