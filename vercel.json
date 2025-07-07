@@ -31,7 +31,7 @@
         "APP_ENV": "production",
         "APP_KEY": "base64:0nU1Ux9swZmHzE3T7YYke1PQNfFOe+CUmXwQOEOq5Xw=",
         "APP_DEBUG": "0",
-        "APP_URL": "https://your-project-name.vercel.app",
+        "APP_URL": "https://our-digiberkat-webv2.vercel.app",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
         "APP_PACKAGES_CACHE": "/tmp/packages.php",
