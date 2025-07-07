@@ -8,22 +8,34 @@
   },
   "routes": [
     {
-      "src": "/build/(.*)",
-      "dest": "/public/build/$1"
+        "src": "/build/(.*)",
+        "dest": "/public/build/$1"
     },
     {
-      "src": "/images/(.*)",
-      "dest": "/public/images/$1"
+        "src": "/admin/css/(.*)",
+        "dest": "/public/admin/css/$1"
+    },
+    {
+        "src": "/admin/js/(.*)",
+        "dest": "/public/admin/js/$1"
+    },
+    {
+        "src": "/js/(.*)",
+        "dest": "/public/js/$1"
+    },
+    {
+        "src": "/images/(.*)",
+        "dest": "/public/images/$1"
     },
     {
         "src": "/(.*\\.php)",
         "dest": "/api/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/api/index.php"
+        "src": "/(.*)",
+        "dest": "/api/index.php"
     }
-  ],
+    ],
   "outputDirectory": "public",
 
     "env": {
